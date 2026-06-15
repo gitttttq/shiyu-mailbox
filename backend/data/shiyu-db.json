@@ -1,0 +1,66 @@
+{
+  "meta": {
+    "version": 1,
+    "seededAt": "2026-06-14T08:44:16.583Z",
+    "adminKeyHint": "Use SHIYU_ADMIN_KEY env or default shiyu-admin-2026 for local admin access."
+  },
+  "users": [
+    {
+      "id": "211f0eb8-3cf2-46c0-bdd6-27e9f19f6e82",
+      "nickname": "测试来信者",
+      "createdAt": "2026-06-14T08:45:06.978Z",
+      "lastActiveAt": "2026-06-14T08:45:06.978Z"
+    },
+    {
+      "id": "user-seed-1",
+      "nickname": "晚风小姐",
+      "createdAt": "2026-06-14T08:44:16.583Z",
+      "lastActiveAt": "2026-06-14T08:44:16.583Z"
+    },
+    {
+      "id": "user-seed-2",
+      "nickname": "山茶",
+      "createdAt": "2026-06-14T08:44:16.583Z",
+      "lastActiveAt": "2026-06-14T08:44:16.583Z"
+    }
+  ],
+  "posts": [
+    {
+      "id": "a4c0b3bb-2b5b-43ec-b287-1b91d2c308eb",
+      "authorId": "211f0eb8-3cf2-46c0-bdd6-27e9f19f6e82",
+      "nickname": "测试来信者",
+      "title": "一封刚写下的信",
+      "mood": "晚安",
+      "content": "今天也想把烦恼放轻一点。",
+      "status": "pending",
+      "pickedCount": 0,
+      "createdAt": "2026-06-14T08:45:06.978Z",
+      "updatedAt": "2026-06-14T08:45:06.978Z"
+    },
+    {
+      "id": "post-seed-1",
+      "authorId": "user-seed-1",
+      "nickname": "晚风小姐",
+      "title": "雨停之后，路灯也变得温柔",
+      "mood": "治愈",
+      "content": "傍晚经过街角花店的时候，忽然觉得日子并不是要被赶着走完，而是要一朵一朵地闻过去。",
+      "status": "approved",
+      "pickedCount": 3,
+      "createdAt": "2026-06-14T08:44:16.583Z",
+      "updatedAt": "2026-06-14T08:44:16.583Z"
+    },
+    {
+      "id": "post-seed-2",
+      "authorId": "user-seed-2",
+      "nickname": "山茶",
+      "title": "给那个迟迟不敢出发的自己",
+      "mood": "勇气",
+      "content": "害怕没有关系，慢一点也没有关系。真正重要的，是你终于愿意把第一步交给自己。",
+      "status": "approved",
+      "pickedCount": 2,
+      "createdAt": "2026-06-14T08:44:16.583Z",
+      "updatedAt": "2026-06-14T08:44:16.583Z"
+    }
+  ],
+  "picks": []
+}

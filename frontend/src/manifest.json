@@ -1,0 +1,14 @@
+{
+  "name": "拾语信箱",
+  "appid": "",
+  "description": "个人心情记录工具",
+  "versionName": "1.0.0",
+  "versionCode": 1,
+  "uniCompilerVersion": "4.0",
+  "mp-weixin": {
+    "appid": "wx01c0138e0c11e052",
+    "setting": {
+      "urlCheck": false
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "时语信箱",
+				"navigationBarTextStyle": "black",
+				"navigationBarBackgroundColor": "#F6EBDD"
+			}
+		},
+		{
+			"path": "pages/pick/index",
+			"style": {
+				"navigationBarTitleText": "捡起心事",
+				"navigationBarTextStyle": "black",
+				"navigationBarBackgroundColor": "#F6EBDD"
+			}
+		},
+		{
+			"path": "pages/write/index",
+			"style": {
+				"navigationBarTitleText": "写下心事",
+				"navigationBarTextStyle": "black",
+				"navigationBarBackgroundColor": "#F6EBDD"
+			}
+		},
+		{
+			"path": "pages/mine/index",
+			"style": {
+				"navigationBarTitleText": "我的信箱",
+				"navigationBarTextStyle": "black",
+				"navigationBarBackgroundColor": "#F6EBDD"
+			}
+		},
+		{
+			"path": "pages/admin/index",
+			"style": {
+				"navigationBarTitleText": "后台管理",
+				"navigationBarTextStyle": "black",
+				"navigationBarBackgroundColor": "#F6EBDD"
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "时语信箱",
+		"navigationBarBackgroundColor": "#F6EBDD",
+		"backgroundColor": "#E9D7C6"
+	}
+}

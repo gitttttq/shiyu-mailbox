@@ -1,7 +1,9 @@
 /**
  * 时语信箱 - 数据请求层
- * 通过 HTTP 请求与后端 API 通信
+ * 优先走微信云开发云函数，HTTP 仅用于本地调试兜底
  */
+
+declare const wx: any;
 
 export type TreeholePostStatus = 'pending' | 'approved' | 'hidden';
 
@@ -20,7 +22,7 @@ export type TreeholePost = {
 };
 
 export type TreeholeUser = {
-	id?: number;
+	id?: number | string;
 	openid?: string;
 	nickname: string;
 	createdAt?: string;
@@ -30,6 +32,11 @@ export type TreeholeUser = {
 	pendingCount?: number;
 };
 
+export type ViewerIdentity = {
+	openid: string;
+	isAdmin: boolean;
+};
+
 type TreeholeResponse<T> = {
 	ok: boolean;
 	data: T;
@@ -37,8 +44,7 @@ type TreeholeResponse<T> = {
 };
 
 // ========== 配置 ==========
-// 开发环境使用本地地址，生产环境替换为你的服务器域名
-const API_BASE_URL = 'http://localhost:3007/api';
+const CLOUD_FUNCTION_NAME = 'treehole';
 
 // ========== 本地存储 ==========
 const STORAGE_NICKNAME_KEY = 'shiyu-nickname';
@@ -75,27 +81,38 @@ export function saveAdminKey(key: string) {
 	uni.setStorageSync(STORAGE_ADMIN_KEY, key.trim());
 }
 
-// ========== HTTP 请求封装 ==========
-function request<T>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', path: string, data?: Record<string, unknown>, headers?: Record<string, string>): Promise<T> {
+function isWechatCloudAvailable() {
+	// #ifdef MP-WEIXIN
+	return typeof wx !== 'undefined' && !!(wx as any).cloud;
+	// #endif
+	// #ifndef MP-WEIXIN
+	return false;
+	// #endif
+}
+
+function callCloud<T>(action: string, data?: Record<string, unknown>): Promise<T> {
 	return new Promise((resolve, reject) => {
-		uni.request({
-			url: API_BASE_URL + path,
-			method,
-			data,
-			header: {
-				'Content-Type': 'application/json',
-				...headers
+		if (!isWechatCloudAvailable()) {
+			reject(new Error('当前环境不可用云开发'));
+			return;
+		}
+
+		(wx as any).cloud.callFunction({
+			name: CLOUD_FUNCTION_NAME,
+			data: {
+				action,
+				data: data || {}
 			},
-			success(res) {
-				const body = res.data as TreeholeResponse<T>;
-				if (res.statusCode >= 200 && res.statusCode < 300 && body && body.ok) {
+			success(res: { result: TreeholeResponse<T> }) {
+				const body = res.result;
+				if (body && body.ok) {
 					resolve(body.data);
-				} else {
-					reject(new Error((body && body.message) || '请求失败'));
+					return;
 				}
+				reject(new Error((body && body.message) || '云函数请求失败'));
 			},
-			fail(err) {
-				reject(new Error(err.errMsg || '网络请求失败'));
+			fail(err: { errMsg?: string }) {
+				reject(new Error(err.errMsg || '云函数调用失败'));
 			}
 		});
 	});
@@ -105,7 +122,11 @@ function request<T>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', path: string, dat
 
 /** 获取首页数据（统计 + 最新公开信件） */
 export function fetchHomeData() {
-	return request<{
+	if (!isWechatCloudAvailable()) {
+		return Promise.reject(new Error('当前环境不支持微信云开发'));
+	}
+
+	return callCloud<{
 		stats: {
 			users: number;
 			approvedPosts: number;
@@ -114,18 +135,26 @@ export function fetchHomeData() {
 			moods: Record<string, number>;
 		};
 		posts: TreeholePost[];
-	}>('GET', '/posts/home');
+	}>('home');
 }
 
 /** 随机获取一封公开信件 */
 export function fetchRandomPost() {
 	const openid = getUserId();
-	return request<{ post: TreeholePost | null }>('GET', '/posts/random?excludeOpenid=' + encodeURIComponent(openid));
+	if (!isWechatCloudAvailable()) {
+		return Promise.reject(new Error('当前环境不支持微信云开发'));
+	}
+	return callCloud<{ post: TreeholePost | null }>('random', { excludeOpenid: openid });
 }
 
 /** 拾取信件 */
 export function pickPost(postId: string) {
-	return request<{ post: TreeholePost }>('POST', '/posts/' + postId + '/pick', {
+	if (!isWechatCloudAvailable()) {
+		return Promise.reject(new Error('当前环境不支持微信云开发'));
+	}
+
+	return callCloud<{ post: TreeholePost }>('pick', {
+		postId,
 		openid: getUserId()
 	});
 }
@@ -133,7 +162,11 @@ export function pickPost(postId: string) {
 /** 创建新信件 */
 export function createPost(input: { nickname: string; title: string; mood: string; content: string }) {
 	saveNickname(input.nickname);
-	return request<{ post: TreeholePost }>('POST', '/posts', {
+	if (!isWechatCloudAvailable()) {
+		return Promise.reject(new Error('当前环境不支持微信云开发'));
+	}
+
+	return callCloud<{ post: TreeholePost }>('createPost', {
 		openid: getUserId(),
 		nickname: input.nickname,
 		title: input.title,
@@ -145,16 +178,24 @@ export function createPost(input: { nickname: string; title: string; mood: strin
 /** 获取我的信件列表 */
 export function fetchMyPosts() {
 	const openid = getUserId();
-	return request<{
+	if (!isWechatCloudAvailable()) {
+		return Promise.reject(new Error('当前环境不支持微信云开发'));
+	}
+
+	return callCloud<{
 		user: TreeholeUser | null;
 		posts: TreeholePost[];
-	}>('GET', '/posts/mine/' + encodeURIComponent(openid));
+	}>('myPosts', { openid });
 }
 
 /** 获取管理后台概览 */
 export function fetchAdminOverview(key: string) {
 	saveAdminKey(key);
-	return request<{
+	if (!isWechatCloudAvailable()) {
+		return Promise.reject(new Error('当前环境不支持微信云开发'));
+	}
+
+	return callCloud<{
 		totals: {
 			users: number;
 			posts: number;
@@ -162,35 +203,45 @@ export function fetchAdminOverview(key: string) {
 			pending: number;
 			hidden: number;
 		};
-	}>('GET', '/admin/overview', undefined, {
-		'x-admin-key': key
-	});
+	}>('adminOverview', { key });
 }
 
 /** 获取管理后台信件列表 */
 export function fetchAdminPosts(input: { key: string; status: string; mood: string; keyword: string }) {
-	const params = new URLSearchParams();
-	if (input.status && input.status !== 'all') params.append('status', input.status);
-	if (input.mood && input.mood !== 'all') params.append('mood', input.mood);
-	if (input.keyword) params.append('keyword', input.keyword);
-	const query = params.toString();
-	return request<{ posts: TreeholePost[] }>('GET', '/admin/posts' + (query ? '?' + query : ''), undefined, {
-		'x-admin-key': input.key
-	});
+	if (!isWechatCloudAvailable()) {
+		return Promise.reject(new Error('当前环境不支持微信云开发'));
+	}
+	return callCloud<{ posts: TreeholePost[] }>('adminPosts', input);
 }
 
 /** 获取管理后台用户列表 */
 export function fetchAdminUsers(key: string) {
-	return request<{ users: TreeholeUser[] }>('GET', '/admin/users', undefined, {
-		'x-admin-key': key
-	});
+	if (!isWechatCloudAvailable()) {
+		return Promise.reject(new Error('当前环境不支持微信云开发'));
+	}
+	return callCloud<{ users: TreeholeUser[] }>('adminUsers', { key });
 }
 
 /** 更新信件状态 */
 export function updateAdminPostStatus(key: string, postId: string, status: TreeholePostStatus) {
-	return request<{ post: TreeholePost }>('PUT', '/admin/posts/' + postId + '/status', {
+	if (!isWechatCloudAvailable()) {
+		return Promise.reject(new Error('当前环境不支持微信云开发'));
+	}
+	return callCloud<{ post: TreeholePost }>('updatePostStatus', {
+		key,
+		postId,
 		status
-	}, {
-		'x-admin-key': key
 	});
+}
+
+/** 获取当前访问者身份（用于管理员入口显隐） */
+export function fetchViewerIdentity() {
+	if (!isWechatCloudAvailable()) {
+		return Promise.resolve<ViewerIdentity>({
+			openid: '',
+			isAdmin: false
+		});
+	}
+
+	return callCloud<ViewerIdentity>('viewer');
 }

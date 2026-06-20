@@ -17,8 +17,8 @@ import Vue from 'vue';
 
 const items = [
 	{ label: '信箱', path: '/pages/index/index' },
-	{ label: '捡信', path: '/pages/pick/index' },
-	{ label: '写信', path: '/pages/write/index' },
+	{ label: '灵感', path: '/pages/pick/index' },
+	{ label: '记录', path: '/pages/write/index' },
 	{ label: '我的', path: '/pages/mine/index' }
 ];
 
@@ -53,35 +53,40 @@ export default Vue.extend({
 	bottom: 24rpx;
 	display: flex;
 	justify-content: space-between;
-	padding: 18rpx;
+	padding: 12rpx;
 	border-radius: 999rpx;
-	background: rgba(255, 249, 243, 0.92);
-	box-shadow: 0 18rpx 38rpx rgba(87, 54, 35, 0.12);
-	border: 1rpx solid rgba(126, 84, 49, 0.1);
-	backdrop-filter: blur(12rpx);
+	background:
+		linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(239, 249, 255, 0.9)),
+		radial-gradient(circle at 16% 0%, rgba(71, 183, 231, 0.22), rgba(71, 183, 231, 0));
+	box-shadow: 0 14rpx 30rpx rgba(36, 111, 146, 0.2);
+	border: 1rpx solid rgba(66, 148, 191, 0.24);
+	backdrop-filter: blur(10rpx);
 	z-index: 30;
 }
 
 .leaf-nav-item {
 	flex: 1;
-	height: 72rpx;
+	height: 78rpx;
 	border-radius: 999rpx;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	transition: all 220ms ease;
 }
 
 .leaf-nav-item-active {
-	background: linear-gradient(135deg, #a77b60, #6b4a3b);
-	box-shadow: 0 10rpx 22rpx rgba(107, 74, 59, 0.2);
+	background: linear-gradient(135deg, #26baf2, #3a8fff);
+	box-shadow: 0 10rpx 22rpx rgba(31, 111, 182, 0.34);
 }
 
 .leaf-nav-label {
 	font-size: 24rpx;
-	color: #775948;
+	font-weight: 700;
+	letter-spacing: 2rpx;
+	color: #286f95;
 }
 
 .leaf-nav-item-active .leaf-nav-label {
-	color: #fff8f2;
+	color: #fff7ef;
 }
 </style>

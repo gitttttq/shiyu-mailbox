@@ -7,6 +7,7 @@
   "uniCompilerVersion": "4.0",
   "mp-weixin": {
     "appid": "wx01c0138e0c11e052",
+    "lazyCodeLoading": "requiredComponents",
     "setting": {
       "urlCheck": false
     }

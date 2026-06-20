@@ -1,9 +1,12 @@
 <template>
 	<view class="page-shell">
+		<view class="ambient ambient-aurora"></view>
+		<view class="ambient ambient-blur"></view>
 		<view class="hero-card">
+			<view class="hero-seal">只在此处校对温柔</view>
 			<view class="hero-topline">ADMIN STUDIO</view>
 			<view class="hero-title">后台管理</view>
-			<view class="hero-copy">在这里审核所有树洞留言，查看用户活跃情况。默认管理口令是 shiyu-admin-2026，请在后端 .env 文件中修改。</view>
+			<view class="hero-copy">在这里审核所有树洞留言，查看用户活跃情况。默认管理口令是 shiyu-admin-2026，可在云函数环境变量中覆盖。</view>
 		</view>
 
 		<view class="login-card">
@@ -166,48 +169,97 @@ export default Vue.extend({
 
 <style>
 page {
-	background: radial-gradient(circle at top, #f8f0e6 0%, #eddccd 42%, #dcc0aa 100%);
+	background:
+		radial-gradient(circle at 6% 10%, rgba(255, 239, 221, 0.92) 0%, rgba(255, 239, 221, 0) 34%),
+		radial-gradient(circle at 98% 4%, rgba(215, 171, 137, 0.34) 0%, rgba(215, 171, 137, 0) 32%),
+		linear-gradient(165deg, #f4e4d2 0%, #ebd4bf 42%, #e3c4ac 100%);
 }
 
 .page-shell {
+	position: relative;
+	overflow: hidden;
 	min-height: 100vh;
 	padding: 28rpx 28rpx 48rpx;
 	box-sizing: border-box;
+}
+
+.ambient {
+	position: absolute;
+	pointer-events: none;
+	z-index: 0;
+}
+
+.ambient-aurora {
+	top: 160rpx;
+	right: -120rpx;
+	width: 340rpx;
+	height: 340rpx;
+	border-radius: 50%;
+	background: radial-gradient(circle, rgba(211, 131, 98, 0.2), rgba(211, 131, 98, 0));
+	animation: drift 10s ease-in-out infinite alternate;
+}
+
+.ambient-blur {
+	top: 760rpx;
+	left: -120rpx;
+	width: 320rpx;
+	height: 320rpx;
+	border-radius: 50%;
+	background: radial-gradient(circle, rgba(112, 84, 62, 0.16), rgba(112, 84, 62, 0));
+	animation: drift 12s ease-in-out infinite alternate-reverse;
 }
 
 .hero-card,
 .login-card,
 .section-card,
 .stat-card {
+	position: relative;
+	z-index: 1;
 	border-radius: 32rpx;
-	background: rgba(255, 249, 243, 0.84);
-	border: 1rpx solid rgba(126, 84, 49, 0.11);
-	box-shadow: 0 22rpx 54rpx rgba(88, 54, 33, 0.1);
+	background: rgba(255, 249, 241, 0.84);
+	border: 1rpx solid rgba(108, 70, 48, 0.13);
+	box-shadow: 0 26rpx 62rpx rgba(88, 54, 33, 0.12);
+	backdrop-filter: blur(4rpx);
 }
 
 .hero-card {
 	padding: 40rpx 32rpx;
-	background: linear-gradient(160deg, rgba(255, 250, 245, 0.96), rgba(240, 224, 208, 0.92));
+	background:
+		linear-gradient(150deg, rgba(255, 251, 245, 0.98), rgba(246, 226, 203, 0.9)),
+		radial-gradient(circle at 92% 12%, rgba(182, 117, 84, 0.2), rgba(182, 117, 84, 0));
+}
+
+.hero-seal {
+	display: inline-flex;
+	padding: 10rpx 22rpx;
+	border-radius: 999rpx;
+	font-size: 21rpx;
+	letter-spacing: 2rpx;
+	color: #7b4f3d;
+	background: rgba(255, 255, 255, 0.7);
+	border: 1rpx solid rgba(144, 97, 68, 0.18);
 }
 
 .hero-topline {
+	margin-top: 20rpx;
 	font-size: 20rpx;
-	letter-spacing: 6rpx;
-	color: #8a6d5b;
+	letter-spacing: 9rpx;
+	color: #946f5a;
 }
 
 .hero-title {
 	margin-top: 18rpx;
-	font-size: 48rpx;
+	font-size: 58rpx;
 	font-weight: 600;
-	color: #4d3529;
+	color: #4a2d23;
+	font-family: "STKaiti", "KaiTi", serif;
 }
 
 .hero-copy {
 	margin-top: 18rpx;
 	font-size: 26rpx;
 	line-height: 1.8;
-	color: #74594a;
+	color: #704f3f;
 }
 
 .login-card,
@@ -220,7 +272,8 @@ page {
 .section-title {
 	font-size: 28rpx;
 	font-weight: 600;
-	color: #53392c;
+	color: #4a2f24;
+	font-family: "STKaiti", "KaiTi", serif;
 }
 
 .text-input {
@@ -230,8 +283,8 @@ page {
 	background: rgba(255, 255, 255, 0.72);
 	padding: 22rpx 24rpx;
 	font-size: 26rpx;
-	color: #5d4436;
-	border: 1rpx solid rgba(126, 84, 49, 0.08);
+	color: #55392c;
+	border: 1rpx solid rgba(126, 84, 49, 0.16);
 	margin-top: 16rpx;
 }
 
@@ -245,7 +298,7 @@ page {
 	justify-content: center;
 	font-size: 26rpx;
 	color: #fff9f5;
-	background: linear-gradient(135deg, #a87d60, #6d4a3c);
+	background: linear-gradient(135deg, #c48260, #7f4433);
 }
 
 .stats-grid {
@@ -263,13 +316,13 @@ page {
 .stat-value {
 	font-size: 42rpx;
 	font-weight: 600;
-	color: #563a2d;
+	color: #4a2f24;
 }
 
 .stat-label {
 	margin-top: 8rpx;
 	font-size: 22rpx;
-	color: #8c705f;
+	color: #866756;
 }
 
 .section-head,
@@ -284,7 +337,7 @@ page {
 .post-meta,
 .user-meta {
 	font-size: 22rpx;
-	color: #9a7662;
+	color: #936d58;
 }
 
 .filter-row {
@@ -299,35 +352,37 @@ page {
 	padding: 14rpx 22rpx;
 	border-radius: 999rpx;
 	font-size: 24rpx;
-	color: #7b604e;
+	color: #6d4c3b;
 	background: rgba(255, 255, 255, 0.58);
 }
 
 .filter-pill-active {
 	color: #fff8f2;
-	background: linear-gradient(135deg, #a77b60, #6b4a3b);
+	background: linear-gradient(135deg, #c48260, #7f4433);
 }
 
 .post-card {
 	margin-top: 18rpx;
 	padding: 24rpx;
 	border-radius: 24rpx;
-	background: rgba(255, 255, 255, 0.66);
-	border: 1rpx solid rgba(126, 84, 49, 0.08);
+	background:
+		linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 249, 244, 0.66)),
+		repeating-linear-gradient(0deg, rgba(154, 121, 95, 0.05) 0, rgba(154, 121, 95, 0.05) 2rpx, transparent 2rpx, transparent 14rpx);
+	border: 1rpx solid rgba(126, 84, 49, 0.16);
 }
 
 .post-title,
 .user-name {
 	font-size: 28rpx;
 	font-weight: 600;
-	color: #50382c;
+	color: #482e23;
 }
 
 .post-content {
 	margin-top: 12rpx;
 	font-size: 25rpx;
 	line-height: 1.8;
-	color: #6d5344;
+	color: #644638;
 }
 
 .post-actions {
@@ -367,11 +422,20 @@ page {
 
 .user-row {
 	padding: 18rpx 0;
-	border-bottom: 1rpx solid rgba(126, 84, 49, 0.08);
+	border-bottom: 1rpx solid rgba(126, 84, 49, 0.12);
 }
 
 .user-row:last-child {
 	border-bottom: 0;
 	padding-bottom: 0;
+}
+
+@keyframes drift {
+	from {
+		transform: translate3d(0, 0, 0) scale(1);
+	}
+	to {
+		transform: translate3d(0, -26rpx, 0) scale(1.08);
+	}
 }
 </style>

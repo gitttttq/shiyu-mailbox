@@ -5,23 +5,23 @@
 			"style": {
 				"navigationBarTitleText": "时语信箱",
 				"navigationBarTextStyle": "black",
-				"navigationBarBackgroundColor": "#F6EBDD"
+				"navigationBarBackgroundColor": "#F4E4D5"
 			}
 		},
 		{
 			"path": "pages/pick/index",
 			"style": {
-				"navigationBarTitleText": "捡起心事",
+				"navigationBarTitleText": "灵感卡片",
 				"navigationBarTextStyle": "black",
-				"navigationBarBackgroundColor": "#F6EBDD"
+				"navigationBarBackgroundColor": "#F4E4D5"
 			}
 		},
 		{
 			"path": "pages/write/index",
 			"style": {
-				"navigationBarTitleText": "写下心事",
+				"navigationBarTitleText": "写下记录",
 				"navigationBarTextStyle": "black",
-				"navigationBarBackgroundColor": "#F6EBDD"
+				"navigationBarBackgroundColor": "#F4E4D5"
 			}
 		},
 		{
@@ -29,22 +29,15 @@
 			"style": {
 				"navigationBarTitleText": "我的信箱",
 				"navigationBarTextStyle": "black",
-				"navigationBarBackgroundColor": "#F6EBDD"
-			}
-		},
-		{
-			"path": "pages/admin/index",
-			"style": {
-				"navigationBarTitleText": "后台管理",
-				"navigationBarTextStyle": "black",
-				"navigationBarBackgroundColor": "#F6EBDD"
+				"navigationBarBackgroundColor": "#F4E4D5"
 			}
 		}
 	],
+	"lazyCodeLoading": "requiredComponents",
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "时语信箱",
-		"navigationBarBackgroundColor": "#F6EBDD",
-		"backgroundColor": "#E9D7C6"
+		"navigationBarBackgroundColor": "#F4E4D5",
+		"backgroundColor": "#EACFBA"
 	}
 }

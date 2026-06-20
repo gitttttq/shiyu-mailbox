@@ -3,11 +3,6 @@ node_modules/
 unpackage/
 dist/
 
-# backend local secrets and data
-backend/.env
-backend/data/*.db
-backend/data/*.db-*
-
 # local env files
 .env.local
 .env.*.local

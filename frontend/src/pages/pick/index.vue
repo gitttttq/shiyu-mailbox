@@ -1,28 +1,33 @@
 <template>
 	<view class="page-shell">
-		<view class="hero-card">
-			<view class="hero-topline">PICK A LETTER</view>
-			<view class="hero-title">从树下，捡起另一颗正在轻轻发热的心</view>
-			<view class="hero-copy">这里的每封信都来自另一个真实的人。也许你无法认识 ta，但你可以接住那一刻的情绪。</view>
+		<view class="ambient ambient-halo"></view>
+		<view class="ambient ambient-shadow"></view>
+
+		<view class="hero-card reveal-1">
+			<view class="hero-mark">DAILY PROMPT</view>
+			<view class="hero-title">给自己一张灵感卡片，开始今天的记录。</view>
+			<view class="hero-copy">
+				卡片内容由系统提供，仅用于自我记录提示，不含用户互看能力。
+			</view>
 		</view>
 
-		<view class="letter-card" v-if="post">
+		<view class="letter-card reveal-2" v-if="post">
 			<view class="letter-meta">
-				<text>{{ post.mood }}</text>
-				<text>{{ post.pickedCount }} 次拾起</text>
+				<text class="mood-tag">{{ post.mood }}</text>
+				<text class="pick-count">今日灵感</text>
 			</view>
 			<view class="letter-title">{{ post.title }}</view>
 			<view class="letter-content">{{ post.content }}</view>
-			<view class="letter-author">{{ post.nickname }}</view>
+			<view class="letter-author">—— 记录提示</view>
 			<view class="action-row">
-				<view class="ghost-button" @tap="loadRandomPost">换一封</view>
-				<view class="solid-button" @tap="handlePick">轻轻拾起</view>
+				<view class="ghost-button" @tap="loadRandomPost">换一张卡片</view>
+				<view class="solid-button" @tap="handlePick">去写记录</view>
 			</view>
 		</view>
 
-		<view v-else class="empty-card">
-			<view class="empty-title">现在还没有可捡起的心事</view>
-			<view class="empty-copy">可能大家都还在写，或者你已经看完了今天能遇见的缘分。</view>
+		<view v-else class="empty-card reveal-2">
+			<view class="empty-title">暂时没有可用卡片</view>
+			<view class="empty-copy">可以稍后再试，或者直接进入记录页写下今天的内容。</view>
 			<view class="solid-button full" @tap="loadRandomPost">再试一次</view>
 		</view>
 
@@ -33,13 +38,26 @@
 <script lang="ts">
 import Vue from 'vue';
 import LeafNav from '@/components/leaf-nav.vue';
-import { fetchRandomPost, pickPost, TreeholePost } from '@/utils/treehole';
+
+type InspirationCard = {
+	id: string;
+	title: string;
+	mood: string;
+	content: string;
+};
+
+const cards: InspirationCard[] = [
+	{ id: '1', title: '今天最想感谢谁', mood: '感恩', content: '写下一个你想感谢的人，以及想对 TA 说的一句话。' },
+	{ id: '2', title: '今天最有成就感的瞬间', mood: '成就', content: '记录一件今天做成的小事，它为什么让你有力量。' },
+	{ id: '3', title: '明天最重要的一件事', mood: '专注', content: '把明天最重要的一件事写下来，并给出第一步行动。' },
+	{ id: '4', title: '给三天后的自己', mood: '鼓励', content: '给未来三天后的自己写一句提醒或鼓励。' }
+];
 
 export default Vue.extend({
 	components: { LeafNav },
 	data() {
 		return {
-			post: null as TreeholePost | null,
+			post: null as InspirationCard | null,
 			loading: false
 		};
 	},
@@ -47,28 +65,17 @@ export default Vue.extend({
 		this.loadRandomPost();
 	},
 	methods: {
-		async loadRandomPost() {
+		loadRandomPost() {
 			this.loading = true;
-			try {
-				const data = await fetchRandomPost();
-				this.post = data.post;
-			} catch (error) {
-				uni.showToast({ title: (error as Error).message, icon: 'none' });
-			} finally {
-				this.loading = false;
-			}
+			const idx = Math.floor(Math.random() * cards.length);
+			this.post = cards[idx];
+			this.loading = false;
 		},
-		async handlePick() {
+		handlePick() {
 			if (!this.post) {
 				return;
 			}
-			try {
-				const data = await pickPost(this.post.id);
-				uni.showToast({ title: '已经替你收好', icon: 'success' });
-				this.post = data.post;
-			} catch (error) {
-				uni.showToast({ title: (error as Error).message, icon: 'none' });
-			}
+			uni.navigateTo({ url: '/pages/write/index' });
 		}
 	}
 });
@@ -76,48 +83,89 @@ export default Vue.extend({
 
 <style>
 page {
-	background: radial-gradient(circle at top, #f8f0e6 0%, #eddccd 42%, #dcc0aa 100%);
+	background:
+		radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.78) 0%, rgba(255, 255, 255, 0) 34%),
+		radial-gradient(circle at 88% 6%, rgba(117, 222, 255, 0.26) 0%, rgba(117, 222, 255, 0) 32%),
+		radial-gradient(circle at 14% 42%, rgba(255, 190, 128, 0.28) 0%, rgba(255, 190, 128, 0) 36%),
+		linear-gradient(160deg, #f1fbff 0%, #e9f7ff 40%, #fdf4ea 100%);
 }
 
 .page-shell {
+	position: relative;
+	overflow: hidden;
 	min-height: 100vh;
-	padding: 28rpx 28rpx 138rpx;
+	padding: 28rpx 28rpx 146rpx;
 	box-sizing: border-box;
+}
+
+.ambient {
+	position: absolute;
+	pointer-events: none;
+	z-index: 0;
+}
+
+.ambient-halo {
+	top: 180rpx;
+	right: -120rpx;
+	width: 350rpx;
+	height: 350rpx;
+	border-radius: 50%;
+	background: radial-gradient(circle, rgba(74, 193, 240, 0.26), rgba(74, 193, 240, 0));
+	animation: drift 12s ease-in-out infinite alternate;
+}
+
+
+.ambient-shadow {
+	top: 760rpx;
+	left: -120rpx;
+	width: 320rpx;
+	height: 320rpx;
+	border-radius: 50%;
+	background: radial-gradient(circle, rgba(255, 181, 112, 0.24), rgba(255, 181, 112, 0));
+	animation: drift 15s ease-in-out infinite alternate-reverse;
 }
 
 .hero-card,
 .letter-card,
 .empty-card {
-	border-radius: 32rpx;
-	background: rgba(255, 249, 243, 0.84);
-	border: 1rpx solid rgba(126, 84, 49, 0.11);
-	box-shadow: 0 22rpx 54rpx rgba(88, 54, 33, 0.1);
+	position: relative;
+	z-index: 1;
+	border-radius: 36rpx;
+	background: rgba(255, 255, 255, 0.82);
+	border: 1rpx solid rgba(53, 109, 143, 0.2);
+	box-shadow: 0 10rpx 24rpx rgba(28, 88, 119, 0.12), 0 24rpx 52rpx rgba(34, 98, 129, 0.1);
+	backdrop-filter: blur(4rpx);
 }
 
 .hero-card {
-	padding: 40rpx 32rpx;
-	background: linear-gradient(160deg, rgba(255, 250, 245, 0.96), rgba(240, 224, 208, 0.92));
+	padding: 42rpx 34rpx;
+	background:
+		linear-gradient(155deg, rgba(255, 255, 255, 0.96), rgba(237, 249, 255, 0.9)),
+		radial-gradient(circle at 90% 12%, rgba(88, 198, 241, 0.24), rgba(88, 198, 241, 0));
 }
 
-.hero-topline {
+.hero-mark {
 	font-size: 20rpx;
-	letter-spacing: 6rpx;
-	color: #8a6d5b;
+	letter-spacing: 5rpx;
+	color: #2f85b0;
+	font-weight: 700;
 }
 
 .hero-title {
-	margin-top: 18rpx;
-	font-size: 50rpx;
-	line-height: 1.35;
-	font-weight: 600;
-	color: #4d3529;
+	margin-top: 20rpx;
+	font-size: 58rpx;
+	line-height: 1.24;
+	font-weight: 700;
+	color: #183143;
+	letter-spacing: 1rpx;
+	font-family: "Avenir Next", "PingFang SC", "Helvetica Neue", sans-serif;
 }
 
 .hero-copy {
-	margin-top: 20rpx;
+	margin-top: 22rpx;
 	font-size: 28rpx;
-	line-height: 1.85;
-	color: #74594a;
+	line-height: 1.7;
+	color: #3a6179;
 }
 
 .letter-card,
@@ -129,75 +177,120 @@ page {
 .letter-meta {
 	display: flex;
 	justify-content: space-between;
+	align-items: center;
+}
+
+.mood-tag {
 	font-size: 22rpx;
-	color: #9b7d6c;
+	padding: 8rpx 20rpx;
+	border-radius: 999rpx;
+	background: rgba(255, 255, 255, 0.75);
+	border: 1rpx solid rgba(66, 150, 193, 0.22);
+	color: #2f7fa8;
+}
+
+.pick-count {
+	font-size: 22rpx;
+	color: #4c7490;
 }
 
 .letter-title {
 	margin-top: 14rpx;
 	font-size: 34rpx;
-	font-weight: 600;
-	color: #50382c;
+	font-weight: 700;
+	color: #1f465f;
+	line-height: 1.35;
 }
 
 .letter-content {
 	margin-top: 18rpx;
 	font-size: 28rpx;
-	line-height: 1.95;
-	color: #6d5344;
+	line-height: 1.85;
+	color: #3c6077;
 }
 
 .letter-author {
 	margin-top: 18rpx;
-	font-size: 22rpx;
-	color: #967969;
+	font-size: 23rpx;
+	color: #8d6b5a;
 }
 
 .action-row {
 	display: flex;
-	justify-content: space-between;
+	gap: 16rpx;
 	margin-top: 30rpx;
 }
 
 .empty-title {
 	font-size: 34rpx;
-	font-weight: 600;
-	color: #53392c;
+	font-weight: 700;
+	color: #4a2f24;
+	font-family: "STSong", "SimSun", serif;
 }
 
 .empty-copy {
 	margin-top: 18rpx;
 	font-size: 26rpx;
-	line-height: 1.85;
-	color: #785c4e;
+	line-height: 1.75;
+	color: #6f5041;
 }
 
 .ghost-button,
 .solid-button {
-	height: 88rpx;
+	height: 90rpx;
 	border-radius: 999rpx;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	font-size: 26rpx;
+	font-size: 30rpx;
+	font-weight: 700;
 }
 
 .ghost-button {
-	width: 48%;
-	color: #765946;
-	background: rgba(255, 255, 255, 0.55);
-	border: 1rpx solid rgba(118, 89, 70, 0.14);
+	flex: 1;
+	color: #266f95;
+	background: rgba(255, 255, 255, 0.84);
+	border: 1rpx solid rgba(64, 149, 193, 0.3);
 }
 
 .solid-button {
-	width: 48%;
-	color: #fff9f5;
-	background: linear-gradient(135deg, #a87d60, #6d4a3c);
-	box-shadow: 0 16rpx 32rpx rgba(109, 74, 60, 0.24);
+	flex: 1;
+	color: #fff8f2;
+	background: linear-gradient(130deg, #22b8f3, #3a8dff);
+	box-shadow: 0 14rpx 26rpx rgba(37, 123, 189, 0.34);
 }
 
 .solid-button.full {
 	width: 100%;
 	margin-top: 26rpx;
+}
+
+@keyframes drift {
+	from {
+		transform: translate3d(0, 0, 0) scale(1);
+	}
+	to {
+		transform: translate3d(0, -26rpx, 0) scale(1.08);
+	}
+}
+
+.reveal-1,
+.reveal-2 {
+	animation: revealUp 560ms ease-out both;
+}
+
+.reveal-2 {
+	animation-delay: 120ms;
+}
+
+@keyframes revealUp {
+	from {
+		opacity: 0;
+		transform: translate3d(0, 18rpx, 0);
+	}
+	to {
+		opacity: 1;
+		transform: translate3d(0, 0, 0);
+	}
 }
 </style>

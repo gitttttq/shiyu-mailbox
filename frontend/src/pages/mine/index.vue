@@ -4,14 +4,36 @@
 		<view class="ambient ambient-shadow"></view>
 
 		<view class="hero-card reveal-1">
-			<view class="hero-mark">ARCHIVE ROOM</view>
-			<view class="hero-title">你写下的每一条记录，都在这里被妥帖保存。</view>
+			<view class="hero-mark">MY SPACE</view>
+			<view class="hero-title">我的记录空间</view>
 			<view class="hero-copy">
-				这是你的私人记录档案，仅在当前设备可见，用来回顾和整理自己的状态。
+				这是你的私人记录档案，仅在当前设备可见。
 			</view>
 		</view>
 
-		<view class="profile-card reveal-2">
+		<view class="stats-card reveal-2" v-if="stats.totalCount > 0">
+			<view class="stats-title">我的记录之旅</view>
+			<view class="stats-grid">
+				<view class="stat-item">
+					<view class="stat-value">{{ stats.totalCount }}</view>
+					<view class="stat-label">总记录数</view>
+				</view>
+				<view class="stat-item">
+					<view class="stat-value">{{ stats.daysUsed }}</view>
+					<view class="stat-label">使用天数</view>
+				</view>
+				<view class="stat-item">
+					<view class="stat-value">{{ stats.totalWords }}</view>
+					<view class="stat-label">累计字数</view>
+				</view>
+			</view>
+			<view class="stats-detail" v-if="stats.firstDate">
+				<text>第一篇记录：{{ stats.firstDate }}</text>
+				<text>最爱情绪：{{ stats.topMood || '暂无' }}</text>
+			</view>
+		</view>
+
+		<view class="profile-card reveal-3">
 			<view class="field-label">我的署名</view>
 			<input
 				v-model="nickname"
@@ -20,15 +42,15 @@
 				maxlength="20"
 				placeholder="给自己取一个温柔名字"
 			/>
-			<view class="field-hint">署名会显示在你的公开信件中，可以随时修改。</view>
+			<view class="field-hint">署名会显示在你的记录中，可以随时修改。</view>
 			<view class="action-row">
 				<view class="ghost-button ghost-button-full" @tap="saveProfile">保存署名</view>
 			</view>
 		</view>
 
-		<view class="section-card reveal-3">
+		<view class="section-card reveal-4">
 			<view class="section-head">
-				<text class="section-title">我的记录档案</text>
+				<text class="section-title">我的记录</text>
 				<text class="section-tag">{{ posts.length }} 封</text>
 			</view>
 			<view v-if="loading" class="empty-text">正在读取你的本地记录...</view>
@@ -37,11 +59,17 @@
 				<view v-for="post in posts" :key="post.id" class="letter-card">
 					<view class="letter-meta">
 						<text class="mood-tag">{{ post.mood }}</text>
-						<text class="status-badge">仅自己可见</text>
+						<text class="date-text">{{ formatDate(post.createdAt) }}</text>
 					</view>
 					<view class="letter-title">{{ post.title }}</view>
 					<view class="letter-content">{{ post.content }}</view>
 				</view>
+			</view>
+		</view>
+
+		<view class="profile-card reveal-5" v-if="isAdmin">
+			<view class="action-row" style="margin-top: 16rpx;">
+				<view class="ghost-button ghost-button-full" @tap="goAdmin">进入管理后台</view>
 			</view>
 		</view>
 
@@ -52,7 +80,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import LeafNav from '@/components/leaf-nav.vue';
-import { getNickname, saveNickname } from '@/utils/treehole';
+import { fetchViewerIdentity, getNickname, saveNickname } from '@/utils/treehole';
 
 type LocalNote = {
 	id: string;
@@ -71,11 +99,38 @@ export default Vue.extend({
 		return {
 			nickname: getNickname(),
 			posts: [] as LocalNote[],
-			loading: false
+			loading: false,
+			isAdmin: false
 		};
+	},
+	computed: {
+		stats(): { totalCount: number; daysUsed: number; totalWords: number; firstDate: string; topMood: string } {
+			if (!this.posts.length) {
+				return { totalCount: 0, daysUsed: 0, totalWords: 0, firstDate: '', topMood: '' };
+			}
+			const sorted = [...this.posts].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+			const firstDate = sorted[0].createdAt.slice(0, 10);
+			const now = new Date();
+			const first = new Date(firstDate);
+			const daysUsed = Math.floor((now.getTime() - first.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+			const totalWords = this.posts.reduce((sum, p) => sum + (p.content || '').length, 0);
+			const moodCount: Record<string, number> = {};
+			this.posts.forEach(p => {
+				moodCount[p.mood] = (moodCount[p.mood] || 0) + 1;
+			});
+			const topMood = Object.keys(moodCount).sort((a, b) => moodCount[b] - moodCount[a])[0] || '';
+			return {
+				totalCount: this.posts.length,
+				daysUsed,
+				totalWords,
+				firstDate,
+				topMood
+			};
+		}
 	},
 	onShow() {
 		this.loadPage();
+		this.loadViewer();
 	},
 	methods: {
 		readLocalNotes(): LocalNote[] {
@@ -85,6 +140,12 @@ export default Vue.extend({
 			}
 			return [];
 		},
+		formatDate(value: string) {
+			if (!value) {
+				return '';
+			}
+			return value.slice(0, 10);
+		},
 		loadPage() {
 			this.loading = true;
 			this.posts = this.readLocalNotes().slice().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
@@ -93,6 +154,17 @@ export default Vue.extend({
 		saveProfile() {
 			saveNickname(this.nickname);
 			uni.showToast({ title: '署名已保存', icon: 'success' });
+		},
+		async loadViewer() {
+			try {
+				const viewer = await fetchViewerIdentity();
+				this.isAdmin = !!viewer.isAdmin;
+			} catch (error) {
+				this.isAdmin = false;
+			}
+		},
+		goAdmin() {
+			uni.navigateTo({ url: '/pages/admin/index' });
 		}
 	}
 });

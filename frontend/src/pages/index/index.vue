@@ -9,76 +9,27 @@
 				<text class="hero-date">{{ todayText }}</text>
 			</view>
 			<view class="hero-title">每一种没说出口的情绪，都值得被郑重收藏。</view>
-			<view class="hero-subtitle">
-				这是你的私人记录空间。
-				写给自己，留给今天，也留给未来回看的你。
-			</view>
 			<view class="hero-actions">
-				<view class="btn-ghost" @tap="goPick">查看灵感卡片</view>
-				<view class="btn-solid" @tap="goWrite">写下一条记录</view>
+				<view class="btn-ghost" @tap="goPick">灵感大厅</view>
+				<view class="btn-solid" @tap="goWrite">写记录</view>
 			</view>
 		</view>
 
-		<view class="metrics-card reveal-2">
-			<view class="metric-item">
-				<view class="metric-value">{{ stats.users }}</view>
-				<view class="metric-label">记录空间</view>
-			</view>
-			<view class="metric-item">
-				<view class="metric-value">{{ stats.approvedPosts }}</view>
-				<view class="metric-label">我的记录数</view>
-			</view>
-			<view class="metric-item">
-				<view class="metric-value">{{ stats.pickedCount }}</view>
-				<view class="metric-label">累计字数/100</view>
-			</view>
-		</view>
-
-		<view class="section-card reveal-3" v-if="featuredPost">
-			<view class="section-head">
-				<text class="section-title">最近一条记录</text>
-				<text class="mood-tag">{{ featuredPost.mood }}</text>
-			</view>
-			<view class="featured-title">{{ featuredPost.title }}</view>
-			<view class="featured-body">{{ featuredPost.content }}</view>
-			<view class="featured-foot">
-				<text>—— {{ featuredPost.nickname }}</text>
-				<text>{{ formatDate(featuredPost.createdAt) }}</text>
-			</view>
-		</view>
-
-		<view class="section-card reveal-4">
-			<view class="section-head">
-				<text class="section-title">我的情绪分布</text>
-				<text class="section-link" @tap="loadPage">刷新谱面</text>
-			</view>
-			<view v-if="moodSummary.length" class="mood-list">
-				<view v-for="item in moodSummary" :key="item.label" class="mood-chip">
-					<text>{{ item.label }}</text>
-					<text class="mood-count">{{ item.count }}</text>
-				</view>
-			</view>
-			<view v-else class="empty-text">还没有记录，先去写下第一条吧。</view>
-		</view>
-
-		<view class="section-card reveal-5">
+		<view class="section-card reveal-2" v-if="recentPost">
 			<view class="section-head">
 				<text class="section-title">最近记录</text>
-				<text class="section-meta">{{ posts.length }} 封</text>
+				<text class="mood-tag">{{ recentPost.mood }}</text>
 			</view>
-			<view v-if="loading" class="empty-text">正在读取本地记录...</view>
-			<view v-else-if="!posts.length" class="empty-text">暂时还没有记录，去写下第一段内容吧。</view>
-			<view v-else>
-				<view v-for="post in posts" :key="post.id" class="letter-card" @tap="openPost(post)">
-					<view class="letter-top">
-						<text>{{ post.mood }}</text>
-						<text>{{ formatDate(post.createdAt) }}</text>
-					</view>
-					<view class="letter-title">{{ post.title }}</view>
-					<view class="letter-body">{{ post.content }}</view>
-					<view class="letter-author">{{ post.nickname }}</view>
-				</view>
+			<view class="featured-title">{{ recentPost.title }}</view>
+			<view class="featured-body">{{ recentPost.content }}</view>
+			<view class="featured-foot">
+				<text>—— {{ recentPost.nickname }}</text>
+				<text>{{ formatDate(recentPost.createdAt) }}</text>
 			</view>
+		</view>
+
+		<view class="section-card reveal-3" v-else>
+			<view class="empty-text">还没有记录，去写下第一条吧。</view>
 		</view>
 
 		<leaf-nav current="/pages/index/index" />
@@ -106,15 +57,7 @@ export default Vue.extend({
 	},
 	data() {
 		return {
-			loading: false,
-			stats: {
-				users: 1,
-				approvedPosts: 0,
-				pendingPosts: 0,
-				pickedCount: 0,
-				moods: {} as Record<string, number>
-			},
-			posts: [] as LocalNote[]
+			recentPost: null as LocalNote | null
 		};
 	},
 	computed: {
@@ -123,17 +66,6 @@ export default Vue.extend({
 			const month = String(now.getMonth() + 1).padStart(2, '0');
 			const day = String(now.getDate()).padStart(2, '0');
 			return now.getFullYear() + '.' + month + '.' + day;
-		},
-		featuredPost(): LocalNote | null {
-			return this.posts.length ? this.posts[0] : null;
-		},
-		moodSummary(): Array<{ label: string; count: number }> {
-			return Object.keys(this.stats.moods)
-				.map((key: string) => ({
-					label: key,
-					count: this.stats.moods[key]
-				}))
-				.sort((a, b) => b.count - a.count);
 		}
 	},
 	onShow() {
@@ -154,37 +86,14 @@ export default Vue.extend({
 			return value.slice(0, 10);
 		},
 		loadPage() {
-			this.loading = true;
 			const notes = this.readLocalNotes().slice().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-			const moods: Record<string, number> = {};
-			let contentLength = 0;
-			notes.forEach((note) => {
-				moods[note.mood] = (moods[note.mood] || 0) + 1;
-				contentLength += (note.content || '').length;
-			});
-			this.posts = notes;
-			this.stats = {
-				users: 1,
-				approvedPosts: notes.length,
-				pendingPosts: 0,
-				pickedCount: Math.floor(contentLength / 100),
-				moods
-			};
-			this.loading = false;
+			this.recentPost = notes.length ? notes[0] : null;
 		},
 		goWrite() {
 			uni.redirectTo({ url: '/pages/write/index' });
 		},
 		goPick() {
 			uni.redirectTo({ url: '/pages/pick/index' });
-		},
-		openPost(post: LocalNote) {
-			uni.showModal({
-				title: post.title,
-				content: post.content + '\n\n—— ' + post.nickname,
-				showCancel: false,
-				confirmText: '记住了'
-			});
 		}
 	}
 });

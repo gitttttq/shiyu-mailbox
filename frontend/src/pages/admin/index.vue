@@ -3,10 +3,9 @@
 		<view class="ambient ambient-aurora"></view>
 		<view class="ambient ambient-blur"></view>
 		<view class="hero-card">
-			<view class="hero-seal">只在此处校对温柔</view>
-			<view class="hero-topline">ADMIN STUDIO</view>
-			<view class="hero-title">后台管理</view>
-			<view class="hero-copy">在这里审核所有树洞留言，查看用户活跃情况。默认管理口令是 shiyu-admin-2026，可在云函数环境变量中覆盖。</view>
+			<view class="hero-mark">ADMIN STUDIO</view>
+			<view class="hero-title">管理后台</view>
+			<view class="hero-copy">在这里审核所有留言，查看用户活跃情况。</view>
 		</view>
 
 		<view class="login-card">
@@ -278,13 +277,16 @@ page {
 
 .text-input {
 	width: 100%;
+	height: 88rpx;
+	line-height: 88rpx;
 	box-sizing: border-box;
-	border-radius: 24rpx;
-	background: rgba(255, 255, 255, 0.72);
-	padding: 22rpx 24rpx;
-	font-size: 26rpx;
-	color: #55392c;
-	border: 1rpx solid rgba(126, 84, 49, 0.16);
+	border-radius: 999rpx;
+	background: rgba(255, 255, 255, 0.94);
+	padding: 0 30rpx;
+	font-size: 30rpx;
+	font-weight: 500;
+	color: #2a546e;
+	border: 2rpx solid rgba(66, 150, 193, 0.24);
 	margin-top: 16rpx;
 }
 

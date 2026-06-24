@@ -4,31 +4,44 @@
 		<view class="ambient ambient-shadow"></view>
 
 		<view class="hero-card reveal-1">
-			<view class="hero-mark">DAILY PROMPT</view>
-			<view class="hero-title">给自己一张灵感卡片，开始今天的记录。</view>
+			<view class="hero-mark">INSPIRATION HALL</view>
+			<view class="hero-title">灵感大厅</view>
 			<view class="hero-copy">
-				卡片内容由系统提供，仅用于自我记录提示，不含用户互看能力。
+				每一张卡片都是一个记录入口，点击感兴趣的卡片，开始今天的书写。
 			</view>
 		</view>
 
-		<view class="letter-card reveal-2" v-if="post">
+		<view class="letter-card reveal-2" v-if="currentCard">
 			<view class="letter-meta">
-				<text class="mood-tag">{{ post.mood }}</text>
-				<text class="pick-count">今日灵感</text>
+				<text class="mood-tag">{{ currentCard.mood }}</text>
+				<text class="pick-count">当前灵感</text>
 			</view>
-			<view class="letter-title">{{ post.title }}</view>
-			<view class="letter-content">{{ post.content }}</view>
+			<view class="letter-title">{{ currentCard.title }}</view>
+			<view class="letter-content">{{ currentCard.content }}</view>
 			<view class="letter-author">—— 记录提示</view>
 			<view class="action-row">
-				<view class="ghost-button" @tap="loadRandomPost">换一张卡片</view>
+				<view class="ghost-button" @tap="loadRandomPost">换一张</view>
 				<view class="solid-button" @tap="handlePick">去写记录</view>
 			</view>
 		</view>
 
-		<view v-else class="empty-card reveal-2">
-			<view class="empty-title">暂时没有可用卡片</view>
-			<view class="empty-copy">可以稍后再试，或者直接进入记录页写下今天的内容。</view>
-			<view class="solid-button full" @tap="loadRandomPost">再试一次</view>
+		<view class="section-card reveal-3">
+			<view class="section-head">
+				<text class="section-title">更多灵感</text>
+				<text class="section-link" @tap="loadRandomPost">随机抽取</text>
+			</view>
+			<view class="card-grid">
+				<view
+					v-for="card in shuffledCards"
+					:key="card.id"
+					class="mini-card"
+					:class="{ 'mini-card-active': currentCard && currentCard.id === card.id }"
+					@tap="selectCard(card)"
+				>
+					<text class="mini-mood">{{ card.mood }}</text>
+					<text class="mini-title">{{ card.title }}</text>
+				</view>
+			</view>
 		</view>
 
 		<leaf-nav current="/pages/pick/index" />
@@ -38,28 +51,28 @@
 <script lang="ts">
 import Vue from 'vue';
 import LeafNav from '@/components/leaf-nav.vue';
+import { INSPIRATION_CARDS, type Mood } from '@/config/constants';
 
 type InspirationCard = {
 	id: string;
 	title: string;
-	mood: string;
+	mood: Mood;
 	content: string;
 };
-
-const cards: InspirationCard[] = [
-	{ id: '1', title: '今天最想感谢谁', mood: '感恩', content: '写下一个你想感谢的人，以及想对 TA 说的一句话。' },
-	{ id: '2', title: '今天最有成就感的瞬间', mood: '成就', content: '记录一件今天做成的小事，它为什么让你有力量。' },
-	{ id: '3', title: '明天最重要的一件事', mood: '专注', content: '把明天最重要的一件事写下来，并给出第一步行动。' },
-	{ id: '4', title: '给三天后的自己', mood: '鼓励', content: '给未来三天后的自己写一句提醒或鼓励。' }
-];
 
 export default Vue.extend({
 	components: { LeafNav },
 	data() {
 		return {
-			post: null as InspirationCard | null,
+			cards: INSPIRATION_CARDS as InspirationCard[],
+			currentCard: null as InspirationCard | null,
 			loading: false
 		};
+	},
+	computed: {
+		shuffledCards(): InspirationCard[] {
+			return [...this.cards].sort(() => Math.random() - 0.5).slice(0, 12);
+		}
 	},
 	onShow() {
 		this.loadRandomPost();
@@ -67,15 +80,20 @@ export default Vue.extend({
 	methods: {
 		loadRandomPost() {
 			this.loading = true;
-			const idx = Math.floor(Math.random() * cards.length);
-			this.post = cards[idx];
+			const idx = Math.floor(Math.random() * this.cards.length);
+			this.currentCard = this.cards[idx];
 			this.loading = false;
 		},
+		selectCard(card: InspirationCard) {
+			this.currentCard = card;
+		},
 		handlePick() {
-			if (!this.post) {
+			if (!this.currentCard) {
 				return;
 			}
-			uni.navigateTo({ url: '/pages/write/index' });
+			// 传递灵感卡片的标题和内容到记录页
+			const query = `inspirationTitle=${encodeURIComponent(this.currentCard.title)}&inspirationContent=${encodeURIComponent(this.currentCard.content)}&inspirationMood=${encodeURIComponent(this.currentCard.mood)}`;
+			uni.navigateTo({ url: `/pages/write/index?${query}` });
 		}
 	}
 });
@@ -263,6 +281,68 @@ page {
 .solid-button.full {
 	width: 100%;
 	margin-top: 26rpx;
+}
+
+.section-card {
+	margin-top: 24rpx;
+	padding: 30rpx;
+}
+
+.section-head {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 18rpx;
+}
+
+.section-title {
+	font-size: 34rpx;
+	font-weight: 700;
+	color: #183143;
+}
+
+.section-link {
+	font-size: 23rpx;
+	color: #2f86b1;
+	font-weight: 700;
+}
+
+.card-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 16rpx;
+}
+
+.mini-card {
+	padding: 24rpx;
+	border-radius: 20rpx;
+	background: rgba(255, 255, 255, 0.88);
+	border: 1rpx solid rgba(66, 150, 193, 0.22);
+	transition: all 0.2s;
+}
+
+.mini-card:active {
+	transform: scale(0.96);
+}
+
+.mini-card-active {
+	background: linear-gradient(135deg, rgba(34, 184, 243, 0.15), rgba(58, 141, 255, 0.15));
+	border-color: rgba(34, 184, 243, 0.4);
+}
+
+.mini-mood {
+	display: block;
+	font-size: 22rpx;
+	color: #2f7fa8;
+	margin-bottom: 8rpx;
+}
+
+.mini-title {
+	display: block;
+	font-size: 28rpx;
+	font-weight: 700;
+	color: #1f465f;
+	line-height: 1.4;
 }
 
 @keyframes drift {

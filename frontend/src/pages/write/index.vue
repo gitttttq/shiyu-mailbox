@@ -11,6 +11,12 @@
 			</view>
 		</view>
 
+		<view class="inspiration-banner reveal-2" v-if="inspirationTitle">
+			<view class="banner-label">灵感提示</view>
+			<view class="banner-title">{{ inspirationTitle }}</view>
+			<view class="banner-content">{{ inspirationContent }}</view>
+		</view>
+
 		<view class="form-card reveal-2">
 			<view class="field-label">落款署名</view>
 			<view class="field-shell">
@@ -72,7 +78,8 @@
 <script lang="ts">
 import Vue from 'vue';
 import LeafNav from '@/components/leaf-nav.vue';
-import { getNickname, saveNickname } from '@/utils/treehole';
+import { createPost, getNickname, saveNickname } from '@/utils/treehole';
+import { MOODS, generateRandomNickname } from '@/config/constants';
 
 const STORAGE_NOTES_KEY = 'shiyu-local-notes';
 
@@ -89,15 +96,31 @@ export default Vue.extend({
 	components: { LeafNav },
 	data() {
 		return {
-			moods: ['想念', '治愈', '勇气', '晚安', '遗憾', '秘密'],
+			moods: MOODS as unknown as string[],
 			form: {
-				nickname: getNickname(),
+				nickname: getNickname() || generateRandomNickname(),
 				title: '',
-				mood: '想念',
+				mood: MOODS[0] as string,
 				content: ''
 			},
-			submitting: false
+			submitting: false,
+			inspirationTitle: '',
+			inspirationContent: '',
+			inspirationMood: '' as string
 		};
+	},
+	onLoad(options: any) {
+		// 接收从灵感卡片传来的参数
+		if (options && options.inspirationTitle) {
+			this.inspirationTitle = decodeURIComponent(options.inspirationTitle);
+			this.inspirationContent = decodeURIComponent(options.inspirationContent || '');
+			this.inspirationMood = decodeURIComponent(options.inspirationMood || '');
+			// 预填表单
+			this.form.title = this.inspirationTitle;
+			if (this.inspirationMood && (MOODS as readonly string[]).includes(this.inspirationMood)) {
+				(this.form as any).mood = this.inspirationMood;
+			}
+		}
 	},
 	methods: {
 		readLocalNotes(): LocalNote[] {
@@ -122,6 +145,7 @@ export default Vue.extend({
 			this.submitting = true;
 			try {
 				saveNickname(this.form.nickname);
+				// 本地存储
 				const notes = this.readLocalNotes();
 				notes.unshift({
 					id: 'note_' + Date.now().toString(36),
@@ -132,6 +156,17 @@ export default Vue.extend({
 					createdAt: new Date().toISOString()
 				});
 				uni.setStorageSync(STORAGE_NOTES_KEY, notes);
+				// 同步到云端
+				try {
+					await createPost({
+						nickname: this.form.nickname || '我',
+						title: this.form.title.trim(),
+						mood: this.form.mood,
+						content: this.form.content.trim()
+					});
+				} catch (cloudError) {
+					console.warn('云端同步失败，已保留本地记录', cloudError);
+				}
 				uni.showToast({ title: '已保存', icon: 'success' });
 				this.form.title = '';
 				this.form.content = '';
@@ -193,7 +228,8 @@ page {
 }
 
 .hero-card,
-.form-card {
+.form-card,
+.inspiration-banner {
 	position: relative;
 	z-index: 1;
 	border-radius: 36rpx;
@@ -201,6 +237,36 @@ page {
 	border: 1rpx solid rgba(53, 109, 143, 0.2);
 	box-shadow: 0 10rpx 24rpx rgba(28, 88, 119, 0.12), 0 24rpx 52rpx rgba(34, 98, 129, 0.1);
 	backdrop-filter: blur(4rpx);
+}
+
+.inspiration-banner {
+	margin-top: 24rpx;
+	padding: 30rpx;
+	background:
+		linear-gradient(155deg, rgba(255, 255, 255, 0.96), rgba(237, 249, 255, 0.9)),
+		radial-gradient(circle at 90% 12%, rgba(88, 198, 241, 0.24), rgba(88, 198, 241, 0));
+}
+
+.banner-label {
+	font-size: 20rpx;
+	letter-spacing: 5rpx;
+	color: #2f85b0;
+	font-weight: 700;
+}
+
+.banner-title {
+	margin-top: 16rpx;
+	font-size: 34rpx;
+	font-weight: 700;
+	color: #183143;
+	line-height: 1.35;
+}
+
+.banner-content {
+	margin-top: 14rpx;
+	font-size: 28rpx;
+	line-height: 1.75;
+	color: #3a6179;
 }
 
 .hero-card {

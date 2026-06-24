@@ -1,11 +1,11 @@
 {
-	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+	"pages": [
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "时语信箱",
+				"navigationBarTitleText": "拾语信箱",
 				"navigationBarTextStyle": "black",
-				"navigationBarBackgroundColor": "#F4E4D5"
+				"navigationBarBackgroundColor": "#F1FBFF"
 			}
 		},
 		{
@@ -13,7 +13,7 @@
 			"style": {
 				"navigationBarTitleText": "灵感卡片",
 				"navigationBarTextStyle": "black",
-				"navigationBarBackgroundColor": "#F4E4D5"
+				"navigationBarBackgroundColor": "#F1FBFF"
 			}
 		},
 		{
@@ -21,7 +21,7 @@
 			"style": {
 				"navigationBarTitleText": "写下记录",
 				"navigationBarTextStyle": "black",
-				"navigationBarBackgroundColor": "#F4E4D5"
+				"navigationBarBackgroundColor": "#F1FBFF"
 			}
 		},
 		{
@@ -29,15 +29,23 @@
 			"style": {
 				"navigationBarTitleText": "我的信箱",
 				"navigationBarTextStyle": "black",
-				"navigationBarBackgroundColor": "#F4E4D5"
+				"navigationBarBackgroundColor": "#F1FBFF"
+			}
+		},
+		{
+			"path": "pages/admin/index",
+			"style": {
+				"navigationBarTitleText": "管理后台",
+				"navigationBarTextStyle": "black",
+				"navigationBarBackgroundColor": "#F1FBFF"
 			}
 		}
 	],
 	"lazyCodeLoading": "requiredComponents",
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "时语信箱",
-		"navigationBarBackgroundColor": "#F4E4D5",
-		"backgroundColor": "#EACFBA"
+		"navigationBarTitleText": "拾语信箱",
+		"navigationBarBackgroundColor": "#F1FBFF",
+		"backgroundColor": "#E9F7FF"
 	}
 }

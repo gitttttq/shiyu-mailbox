@@ -169,9 +169,10 @@ export default Vue.extend({
 <style>
 page {
 	background:
-		radial-gradient(circle at 6% 10%, rgba(255, 239, 221, 0.92) 0%, rgba(255, 239, 221, 0) 34%),
-		radial-gradient(circle at 98% 4%, rgba(215, 171, 137, 0.34) 0%, rgba(215, 171, 137, 0) 32%),
-		linear-gradient(165deg, #f4e4d2 0%, #ebd4bf 42%, #e3c4ac 100%);
+		radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.78) 0%, rgba(255, 255, 255, 0) 34%),
+		radial-gradient(circle at 88% 6%, rgba(117, 222, 255, 0.26) 0%, rgba(117, 222, 255, 0) 32%),
+		radial-gradient(circle at 14% 42%, rgba(255, 190, 128, 0.28) 0%, rgba(255, 190, 128, 0) 36%),
+		linear-gradient(160deg, #f1fbff 0%, #e9f7ff 40%, #fdf4ea 100%);
 }
 
 .page-shell {
@@ -189,23 +190,23 @@ page {
 }
 
 .ambient-aurora {
-	top: 160rpx;
-	right: -120rpx;
-	width: 340rpx;
-	height: 340rpx;
-	border-radius: 50%;
-	background: radial-gradient(circle, rgba(211, 131, 98, 0.2), rgba(211, 131, 98, 0));
-	animation: drift 10s ease-in-out infinite alternate;
-}
-
-.ambient-blur {
-	top: 760rpx;
-	left: -120rpx;
+	top: 200rpx;
+	right: -100rpx;
 	width: 320rpx;
 	height: 320rpx;
 	border-radius: 50%;
-	background: radial-gradient(circle, rgba(112, 84, 62, 0.16), rgba(112, 84, 62, 0));
-	animation: drift 12s ease-in-out infinite alternate-reverse;
+	background: radial-gradient(circle, rgba(74, 193, 240, 0.26), rgba(74, 193, 240, 0));
+	animation: drift 12s ease-in-out infinite alternate;
+}
+
+.ambient-blur {
+	top: 920rpx;
+	left: -120rpx;
+	width: 300rpx;
+	height: 300rpx;
+	border-radius: 50%;
+	background: radial-gradient(circle, rgba(255, 181, 112, 0.24), rgba(255, 181, 112, 0));
+	animation: drift 15s ease-in-out infinite alternate-reverse;
 }
 
 .hero-card,
@@ -214,18 +215,25 @@ page {
 .stat-card {
 	position: relative;
 	z-index: 1;
-	border-radius: 32rpx;
-	background: rgba(255, 249, 241, 0.84);
-	border: 1rpx solid rgba(108, 70, 48, 0.13);
-	box-shadow: 0 26rpx 62rpx rgba(88, 54, 33, 0.12);
+	border-radius: 36rpx;
+	background: rgba(255, 255, 255, 0.82);
+	border: 1rpx solid rgba(53, 109, 143, 0.2);
+	box-shadow: 0 10rpx 24rpx rgba(28, 88, 119, 0.12), 0 24rpx 52rpx rgba(34, 98, 129, 0.1);
 	backdrop-filter: blur(4rpx);
 }
 
 .hero-card {
-	padding: 40rpx 32rpx;
+	padding: 42rpx 34rpx;
 	background:
-		linear-gradient(150deg, rgba(255, 251, 245, 0.98), rgba(246, 226, 203, 0.9)),
-		radial-gradient(circle at 92% 12%, rgba(182, 117, 84, 0.2), rgba(182, 117, 84, 0));
+		linear-gradient(155deg, rgba(255, 255, 255, 0.96), rgba(237, 249, 255, 0.9)),
+		radial-gradient(circle at 90% 12%, rgba(88, 198, 241, 0.24), rgba(88, 198, 241, 0));
+}
+
+.hero-mark {
+	font-size: 20rpx;
+	letter-spacing: 5rpx;
+	color: #2f85b0;
+	font-weight: 700;
 }
 
 .hero-seal {
@@ -247,18 +255,20 @@ page {
 }
 
 .hero-title {
-	margin-top: 18rpx;
-	font-size: 58rpx;
-	font-weight: 600;
-	color: #4a2d23;
-	font-family: "STKaiti", "KaiTi", serif;
+	margin-top: 20rpx;
+	font-size: 56rpx;
+	line-height: 1.24;
+	font-weight: 700;
+	color: #183143;
+	letter-spacing: 1rpx;
+	font-family: "Avenir Next", "PingFang SC", "Helvetica Neue", sans-serif;
 }
 
 .hero-copy {
-	margin-top: 18rpx;
-	font-size: 26rpx;
-	line-height: 1.8;
-	color: #704f3f;
+	margin-top: 22rpx;
+	font-size: 28rpx;
+	line-height: 1.75;
+	color: #3a6179;
 }
 
 .login-card,
@@ -269,10 +279,10 @@ page {
 
 .field-label,
 .section-title {
-	font-size: 28rpx;
-	font-weight: 600;
-	color: #4a2f24;
-	font-family: "STKaiti", "KaiTi", serif;
+	font-size: 34rpx;
+	font-weight: 700;
+	color: #1e4963;
+	font-family: "Avenir Next", "PingFang SC", "Helvetica Neue", sans-serif;
 }
 
 .text-input {
@@ -299,8 +309,8 @@ page {
 	align-items: center;
 	justify-content: center;
 	font-size: 26rpx;
-	color: #fff9f5;
-	background: linear-gradient(135deg, #c48260, #7f4433);
+	color: #fff;
+	background: linear-gradient(135deg, #4ac3f0, #2f85b0);
 }
 
 .stats-grid {
@@ -317,14 +327,14 @@ page {
 
 .stat-value {
 	font-size: 42rpx;
-	font-weight: 600;
-	color: #4a2f24;
+	font-weight: 700;
+	color: #183143;
 }
 
 .stat-label {
 	margin-top: 8rpx;
 	font-size: 22rpx;
-	color: #866756;
+	color: #3a6179;
 }
 
 .section-head,
@@ -339,7 +349,7 @@ page {
 .post-meta,
 .user-meta {
 	font-size: 22rpx;
-	color: #936d58;
+	color: #3a6179;
 }
 
 .filter-row {
@@ -354,13 +364,15 @@ page {
 	padding: 14rpx 22rpx;
 	border-radius: 999rpx;
 	font-size: 24rpx;
-	color: #6d4c3b;
-	background: rgba(255, 255, 255, 0.58);
+	color: #2f7fa8;
+	background: rgba(255, 255, 255, 0.76);
+	border: 1rpx solid rgba(66, 150, 193, 0.22);
 }
 
 .filter-pill-active {
-	color: #fff8f2;
-	background: linear-gradient(135deg, #c48260, #7f4433);
+	color: #fff;
+	background: linear-gradient(135deg, #4ac3f0, #2f85b0);
+	border-color: transparent;
 }
 
 .post-card {
@@ -368,23 +380,24 @@ page {
 	padding: 24rpx;
 	border-radius: 24rpx;
 	background:
-		linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 249, 244, 0.66)),
-		repeating-linear-gradient(0deg, rgba(154, 121, 95, 0.05) 0, rgba(154, 121, 95, 0.05) 2rpx, transparent 2rpx, transparent 14rpx);
-	border: 1rpx solid rgba(126, 84, 49, 0.16);
+		linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(237, 248, 255, 0.78)),
+		repeating-linear-gradient(0deg, rgba(88, 178, 218, 0.06) 0, rgba(88, 178, 218, 0.06) 2rpx, transparent 2rpx, transparent 14rpx);
+	border: 1rpx solid rgba(66, 150, 193, 0.22);
+	box-shadow: inset 0 1rpx 0 rgba(255, 255, 255, 0.8);
 }
 
 .post-title,
 .user-name {
-	font-size: 28rpx;
-	font-weight: 600;
-	color: #482e23;
+	font-size: 30rpx;
+	font-weight: 700;
+	color: #183143;
 }
 
 .post-content {
 	margin-top: 12rpx;
-	font-size: 25rpx;
-	line-height: 1.8;
-	color: #644638;
+	font-size: 26rpx;
+	line-height: 1.75;
+	color: #3a6179;
 }
 
 .post-actions {
@@ -404,13 +417,13 @@ page {
 }
 
 .approve {
-	background: rgba(97, 143, 90, 0.14);
-	color: #4d6b43;
+	background: rgba(74, 193, 240, 0.14);
+	color: #2f85b0;
 }
 
 .pending {
-	background: rgba(193, 143, 62, 0.14);
-	color: #8d6630;
+	background: rgba(255, 181, 112, 0.14);
+	color: #c48260;
 }
 
 .hide {
@@ -424,7 +437,7 @@ page {
 
 .user-row {
 	padding: 18rpx 0;
-	border-bottom: 1rpx solid rgba(126, 84, 49, 0.12);
+	border-bottom: 1rpx solid rgba(66, 150, 193, 0.12);
 }
 
 .user-row:last-child {
